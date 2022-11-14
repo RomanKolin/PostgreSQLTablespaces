@@ -1,0 +1,28 @@
+CREATE USER tsuser WITH superuser;
+ALTER USER tsuser WITH password 'IT2017yearts';
+CREATE DATABASE TableSpace;
+ALTER DATABASE  TableSpace OWNER TO tsuser;
+\c tablespace
+SELECT oid, spcname, usename FROM pg_tablespace JOIN pg_user ON usesysid=spcowner;
+CREATE TABLESPACE tablespacets OWNER tsuser LOCATION '/home/romankolin/Downloads/tablespace';
+CREATE TABLESPACE tablespacetsd OWNER tsuser LOCATION '/home/romankolin/Documents/tablespace';
+CREATE TABLESPACE tablespacetsp OWNER tsuser LOCATION '/home/romankolin/Pictures/tablespace';
+CREATE TABLE tablespace(x SMALLINT);
+CREATE TABLE tablespaced(y SMALLINT) TABLESPACE tablespacetsd;
+CREATE TABLE tablespacep(z SMALLINT) TABLESPACE tablespacetsp;
+SELECT * FROM pg_tables WHERE schemaname='public';
+ALTER TABLE tablespace SET TABLESPACE tablespacets;
+INSERT INTO tablespace VALUES(14);
+INSERT INTO tablespaced VALUES(1), (101), (23);
+INSERT INTO tablespacep SELECT (random()*(-100-100+1))+100 FROM generate_series(1, 10);
+ALTER TABLE tablespaced SET TABLESPACE tablespacets;
+ALTER TABLE tablespacep SET TABLESPACE tablespacets;
+SELECT relfilenode, tablename, tableowner, tablespace FROM pg_tables JOIN pg_class ON tablename=relname WHERE schemaname='public';
+ALTER TABLE tablespace SET TABLESPACE pg_default;
+ALTER TABLE tablespaced SET TABLESPACE pg_default;
+ALTER TABLE tablespacep SET TABLESPACE pg_default;
+DROP TABLESPACE tablespacets;
+DROP TABLESPACE tablespacetsd;
+DROP TABLESPACE tablespacetsp;
+DROP TABLE tablespace, tablespaced, tablespacep;
+CREATE TABLESPACE tablespacetsmnt OWNER tsuser LOCATION '/mnt/tsmnt';
